@@ -1,11 +1,11 @@
-# @balmychan/nestjs-simple-redis-lock
+# @oro-dxeco/nestjs-simple-redis-lock
 
 Distributed lock with single redis instance, simple and easy to use for [Nestjs](https://github.com/nestjs/nest)
 
 ## Installation
 
 ```
-npm install @balmychan/nestjs-simple-redis-lock
+npm install @oro-dxeco/nestjs-simple-redis-lock
 ```
 
 ## Usage
@@ -14,7 +14,7 @@ You must install [nestjs-redis](https://github.com/liaoliaots/nestjs-redis), and
 
 ```JavaScript
 // app.ts
-import { RedisLockModule } from '@balmychan/nestjs-simple-redis-lock';
+import { RedisLockModule } from '@oro-dxeco/nestjs-simple-redis-lock';
 
 @Module({
   imports: [
@@ -44,7 +44,7 @@ export class AppModule {}
 ### 1. Simple example
 
 ```TypeScript
-import { RedisLockService } from '@balmychan/nestjs-simple-redis-lock';
+import { RedisLockService } from '@oro-dxeco/nestjs-simple-redis-lock';
 
 export class FooService {
   constructor(
@@ -83,11 +83,11 @@ export class FooService {
 
 ### 2. Example by using decorator
 
-Using `@balmychan/nestjs-simple-redis-lock` by decorator, the locking and unlocking will be very easy.
+Using `@oro-dxeco/nestjs-simple-redis-lock` by decorator, the locking and unlocking will be very easy.
 Simple example with constant lock name:
 
 ```TypeScript
-import { RedisLockService, RedisLock } from '@balmychan/nestjs-simple-redis-lock';
+import { RedisLockService, RedisLock } from '@oro-dxeco/nestjs-simple-redis-lock';
 
 export class FooService {
   constructor(
@@ -124,7 +124,7 @@ The first parameter of this decorator is a powerful function. It can use to dete
 Simple example with dynamic lock name:
 
 ```TypeScript
-import { RedisLockService, RedisLock } from '@balmychan/nestjs-simple-redis-lock';
+import { RedisLockService, RedisLock } from '@oro-dxeco/nestjs-simple-redis-lock';
 
 export class FooService {
   lockName = 'test3';
