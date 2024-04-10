@@ -58,24 +58,23 @@ export class RedisLockService {
    * @param {number} [maxRetryTimes] max times to retry
    */
   public async lock(name: string, options?: ILockOptions): Promise<void> {
-    const { single = true, errorMessage, expire = 60000, retryInterval = 100, maxRetryTimes = 36000 } = options || {};
+    const { single = true, errorMessage, errorCb, expire = 60000, retryInterval = 100, maxRetryTimes = 36000 } = options || {};
 
     let retryTimes = 0;
     while (true) {
-      try {
-        if (await this.lockOnce(name, expire, single)) {
-          break;
-        } else {
-          if (single) throw new Error(errorMessage || `RedisLockService: locking ${name}, please try later`);
-
-          await this.sleep(retryInterval);
-          if (retryTimes >= maxRetryTimes) {
-            throw new Error(`RedisLockService: locking ${name} timed out`);
-          }
-          retryTimes++;
+      if (await this.lockOnce(name, expire, single)) {
+        break;
+      } else {
+        if (single) {
+          errorCb && errorCb(name, this);
+          throw new Error(errorMessage || `RedisLockService: locking ${name}, please try later`);
         }
-      } catch (error) {
-        if (single) return Promise.reject(error);
+
+        await this.sleep(retryInterval);
+        if (retryTimes >= maxRetryTimes) {
+          throw new Error(`RedisLockService: locking ${name} timed out`);
+        }
+        retryTimes++;
       }
     }
   }

@@ -1,5 +1,6 @@
 import { ModuleMetadata, Type } from "@nestjs/common/interfaces";
 import Redis from "ioredis";
+import { RedisLockService } from "lib/redisLock.service";
 
 export interface RedisLockOptions {
   prefix?: string;
@@ -23,4 +24,5 @@ export interface ILockOptions {
   maxRetryTimes?: number;
   single?: boolean;
   errorMessage?: string;
+  errorCb?: (name: string, service: RedisLockService) => any;
 }
