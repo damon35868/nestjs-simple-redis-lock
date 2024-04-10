@@ -28,6 +28,11 @@ export function RedisLock(lockName: String | GetLockNameFunc, options?: ILockOpt
       return lockService;
     };
     descriptor.value = async function (...args) {
+      options = {
+        ...options,
+        single: options.single === undefined ? true : options.single
+      };
+
       const { single = true } = options || {};
       const lockService = getLockService(this);
       let name: string;
@@ -36,13 +41,17 @@ export function RedisLock(lockName: String | GetLockNameFunc, options?: ILockOpt
       } else if (typeof lockName === "function") {
         name = lockName(this, ...args);
       }
+
       try {
-        const message = await lockService.lock(name, options);
-        const res = await value.call(this, ...args);
-        if (single && !!message) throw new Error(message);
-        return res;
+        await lockService.lock(name, options);
+
+        try {
+          return await value.call(this, ...args);
+        } finally {
+          single && lockService.unlock(name, single);
+        }
       } finally {
-        lockService.unlock(name, single);
+        !single && lockService.unlock(name, single);
       }
     };
     return descriptor;
