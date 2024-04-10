@@ -44,9 +44,9 @@ export class RedisLockService {
    * @param {number} [expire] milliseconds, TTL for the redis key
    * @returns {boolean} true: success, false: failed
    */
-  public async lockOnce(name, expire) {
+  public async lockOnce(name, expire, single = true) {
     const client = this.getClient();
-    const result = await client.set(this.prefix(name), this.uuid, "PX", expire, "NX");
+    const result = await client.set(this.prefix(name), single ? name : this.uuid, "PX", expire, "NX");
     debug(`lock: ${name}, result: ${result}`);
     return result !== null;
   }
@@ -62,7 +62,7 @@ export class RedisLockService {
 
     let retryTimes = 0;
     while (true) {
-      if (await this.lockOnce(name, expire)) {
+      if (await this.lockOnce(name, expire, single)) {
         break;
       } else {
         if (single) throw new Error(errorMessage || `RedisLockService: locking ${name}, please try later`);
