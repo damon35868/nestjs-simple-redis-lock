@@ -28,6 +28,7 @@ export function RedisLock(lockName: String | GetLockNameFunc, options?: ILockOpt
       return lockService;
     };
     descriptor.value = async function (...args) {
+      const { single = true } = options || {};
       const lockService = getLockService(this);
       let name: string;
       if (typeof lockName === "string") {
@@ -38,10 +39,10 @@ export function RedisLock(lockName: String | GetLockNameFunc, options?: ILockOpt
       try {
         await lockService.lock(name, options);
         const res = await value.call(this, ...args);
-        if (options.single) lockService.unlock(name, options.single);
+        if (single) lockService.unlock(name, single);
         return res;
       } finally {
-        if (!options.single) lockService.unlock(name, options.single);
+        if (!single) lockService.unlock(name, single);
       }
     };
     return descriptor;
