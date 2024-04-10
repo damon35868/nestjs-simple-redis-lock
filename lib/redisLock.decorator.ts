@@ -37,9 +37,11 @@ export function RedisLock(lockName: String | GetLockNameFunc, options?: ILockOpt
       }
       try {
         await lockService.lock(name, options);
-        return await value.call(this, ...args);
+        const res = await value.call(this, ...args);
+        if (options.single) lockService.unlock(name, options.single);
+        return res;
       } finally {
-        lockService.unlock(name);
+        if (!options.single) lockService.unlock(name, options.single);
       }
     };
     return descriptor;

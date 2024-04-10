@@ -62,16 +62,20 @@ export class RedisLockService {
 
     let retryTimes = 0;
     while (true) {
-      if (await this.lockOnce(name, expire, single)) {
-        break;
-      } else {
-        if (single) throw new Error(errorMessage || `RedisLockService: locking ${name}, please try later`);
+      try {
+        if (await this.lockOnce(name, expire, single)) {
+          break;
+        } else {
+          if (single) throw new Error(errorMessage || `RedisLockService: locking ${name}, please try later`);
 
-        await this.sleep(retryInterval);
-        if (retryTimes >= maxRetryTimes) {
-          throw new Error(`RedisLockService: locking ${name} timed out`);
+          await this.sleep(retryInterval);
+          if (retryTimes >= maxRetryTimes) {
+            throw new Error(`RedisLockService: locking ${name} timed out`);
+          }
+          retryTimes++;
         }
-        retryTimes++;
+      } catch (error) {
+        if (single) return Promise.reject(error);
       }
     }
   }
@@ -80,13 +84,13 @@ export class RedisLockService {
    * Unlock a lock by name
    * @param {string} name lock name
    */
-  public async unlock(name) {
+  public async unlock(name, single = true) {
     const client = this.getClient();
     const result = await client.eval(
       "if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end",
       1,
       this.prefix(name),
-      this.uuid
+      single ? name : this.uuid
     );
     debug(`unlock: ${name}, result: ${result}`);
   }
