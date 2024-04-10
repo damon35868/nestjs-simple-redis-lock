@@ -1,11 +1,11 @@
-# @oro-dxeco/nestjs-simple-redis-lock
+# @damon35868/nestjs-simple-redis-lock
 
 Distributed lock with single redis instance, simple and easy to use for [Nestjs](https://github.com/nestjs/nest)
 
 ## Installation
 
 ```
-npm install @oro-dxeco/nestjs-simple-redis-lock
+npm install @damon35868/nestjs-simple-redis-lock
 ```
 
 ## Usage
@@ -14,7 +14,7 @@ You must install [nestjs-redis](https://github.com/liaoliaots/nestjs-redis), and
 
 ```JavaScript
 // app.ts
-import { RedisLockModule } from '@oro-dxeco/nestjs-simple-redis-lock';
+import { RedisLockModule } from '@damon35868/nestjs-simple-redis-lock';
 
 @Module({
   imports: [
@@ -41,10 +41,57 @@ import { RedisLockModule } from '@oro-dxeco/nestjs-simple-redis-lock';
 export class AppModule {}
 ```
 
+### New Feature
+
+#### default single is true
+
+```TypeScript
+import { RedisLockService } from '@damon35868/nestjs-simple-redis-lock';
+
+export class FooService {
+  constructor(
+    protected readonly lockService: RedisLockService, // inject RedisLockService
+  ) {}
+
+  async test1() {
+    try {
+      /**
+       * Get a lock by name
+       * Automatically unlock after 1min
+       * Try again after 100ms
+       * The max times to retry is 36000, about 1h
+       */
+
+      // default single is true
+      await this.lockService.lock('test1', { single:true });
+      // Do somethings
+    } catch(e:any){
+      // do someting on lock fail
+      throw new Error(e.message || `RedisLockService: locking for ***, plase try later`);
+    } inally { // use 'finally' to ensure unlocking
+      this.lockService.unlock('test1'); // unlock
+      // Or: await this.lockService.unlock('test1'); wait for the unlocking
+    }
+  }
+
+  async test2() {
+    /**
+     * Automatically unlock after 2min
+     * Try again after 50ms if failed
+     * The max times to retry is 100
+     */
+    await this.lockService.lock('test1', { expire: 2 * 60 * 1000, retryInterval:50, maxRetryTimes: 100 });
+    // Do somethings
+    await this.lockService.setTTL('test1', 60000); // Renewal the lock when the program is very time consuming, avoiding automatically unlock
+    this.lockService.unlock('test1');
+  }
+}
+```
+
 ### 1. Simple example
 
 ```TypeScript
-import { RedisLockService } from '@oro-dxeco/nestjs-simple-redis-lock';
+import { RedisLockService } from '@damon35868/nestjs-simple-redis-lock';
 
 export class FooService {
   constructor(
@@ -73,7 +120,7 @@ export class FooService {
      * Try again after 50ms if failed
      * The max times to retry is 100
      */
-    await this.lockService.lock('test1', 2 * 60 * 1000, 50, 100);
+    await this.lockService.lock('test1', { expire: 2 * 60 * 1000, retryInterval:50, maxRetryTimes: 100 });
     // Do somethings
     await this.lockService.setTTL('test1', 60000); // Renewal the lock when the program is very time consuming, avoiding automatically unlock
     this.lockService.unlock('test1');
@@ -83,11 +130,11 @@ export class FooService {
 
 ### 2. Example by using decorator
 
-Using `@oro-dxeco/nestjs-simple-redis-lock` by decorator, the locking and unlocking will be very easy.
+Using `@damon35868/nestjs-simple-redis-lock` by decorator, the locking and unlocking will be very easy.
 Simple example with constant lock name:
 
 ```TypeScript
-import { RedisLockService, RedisLock } from '@oro-dxeco/nestjs-simple-redis-lock';
+import { RedisLockService, RedisLock } from '@damon35868/nestjs-simple-redis-lock';
 
 export class FooService {
   constructor(
@@ -124,7 +171,7 @@ The first parameter of this decorator is a powerful function. It can use to dete
 Simple example with dynamic lock name:
 
 ```TypeScript
-import { RedisLockService, RedisLock } from '@oro-dxeco/nestjs-simple-redis-lock';
+import { RedisLockService, RedisLock } from '@damon35868/nestjs-simple-redis-lock';
 
 export class FooService {
   lockName = 'test3';

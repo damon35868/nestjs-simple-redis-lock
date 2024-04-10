@@ -1,6 +1,6 @@
 {
-  "name": "@oro-dxeco/nestjs-simple-redis-lock",
-  "version": "10.0.0",
+  "name": "@damon35868/nestjs-simple-redis-lock",
+  "version": "1.0.0",
   "description": "Distributed lock with single redis instance, simple and easy to use for Nestjs",
   "main": "index.js",
   "scripts": {
@@ -15,11 +15,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/oro-dxeco/nestjs-simple-redis-lock.git"
+    "url": "git+ssh://git@github.com:damon35868/nestjs-simple-redis-lock.git"
   },
-  "author": "oRo Co., Ltd. <oro_dxeco@jp.oro.com>",
+  "author": "D.M <damonzhang35868@gamil.com>",
   "license": "MIT",
-  "homepage": "https://github.com/oro-dxeco/nestjs-simple-redis-lock#readme",
+  "homepage": "https://github.com/damon35868/nestjs-simple-redis-lock/blob/master/README.md",
   "dependencies": {
     "@nestjs/common": "^10.2.7",
     "@nestjs/core": "^10.2.7",
