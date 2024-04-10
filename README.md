@@ -159,7 +159,7 @@ export class FooService {
    * Try again after 50ms if failed
    * The max times to retry is 100
    */
-  @RedisLock('test2', 2 * 60 * 1000, 50, 100)
+  @RedisLock('test2', { expire: 2 * 60 * 1000, retryInterval:50, maxRetryTimes: 100 })
   async test2() {
     // Do somethings
     return 'some values';
