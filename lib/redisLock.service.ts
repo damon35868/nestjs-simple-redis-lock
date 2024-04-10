@@ -65,7 +65,7 @@ export class RedisLockService {
       if (await this.lockOnce(name, expire)) {
         break;
       } else {
-        if (single) throw new Error(`RedisLockService: locking ${name}, plase try later`);
+        if (single) throw new Error(`RedisLockService: locking ${name}, please try later`);
 
         await this.sleep(retryInterval);
         if (retryTimes >= maxRetryTimes) {

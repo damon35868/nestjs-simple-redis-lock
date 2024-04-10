@@ -67,7 +67,7 @@ export class FooService {
       // Do somethings
     } catch(e:any){
       // do someting on lock fail
-      throw new Error(e.message || `RedisLockService: locking for ***, plase try later`);
+      throw new Error(e.message || `RedisLockService: locking for ***, please try later`);
     } inally { // use 'finally' to ensure unlocking
       this.lockService.unlock('test1'); // unlock
       // Or: await this.lockService.unlock('test1'); wait for the unlocking
