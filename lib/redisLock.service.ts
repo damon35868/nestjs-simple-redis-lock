@@ -58,14 +58,14 @@ export class RedisLockService {
    * @param {number} [maxRetryTimes] max times to retry
    */
   public async lock(name: string, options?: ILockOptions): Promise<void> {
-    const { single = true, expire = 60000, retryInterval = 100, maxRetryTimes = 36000 } = options || {};
+    const { single = true, errorMessage, expire = 60000, retryInterval = 100, maxRetryTimes = 36000 } = options || {};
 
     let retryTimes = 0;
     while (true) {
       if (await this.lockOnce(name, expire)) {
         break;
       } else {
-        if (single) throw new Error(`RedisLockService: locking ${name}, please try later`);
+        if (single) throw new Error(errorMessage || `RedisLockService: locking ${name}, please try later`);
 
         await this.sleep(retryInterval);
         if (retryTimes >= maxRetryTimes) {

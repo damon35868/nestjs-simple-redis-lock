@@ -22,4 +22,5 @@ export interface ILockOptions {
   retryInterval?: number;
   maxRetryTimes?: number;
   single?: boolean;
+  errorMessage?: string;
 }
