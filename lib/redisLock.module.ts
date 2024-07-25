@@ -1,30 +1,32 @@
-import { Module, DynamicModule, Provider } from '@nestjs/common';
-import { RedisLockService } from './redisLock.service';
-import { RedisLockOptions, RedisLockAsyncOptions, RedisLockOptionsFactory } from './interfaces/redisLockOptions.interface';
-import { REDIS_LOCK_OPTIONS } from './redisLock.constants';
+import { Module, DynamicModule, Provider } from "@nestjs/common";
+import { RedisLockService } from "./redisLock.service";
+import { RedisLockOptions, RedisLockAsyncOptions, RedisLockOptionsFactory } from "./interfaces/redisLockOptions.interface";
+import { REDIS_LOCK_OPTIONS } from "./redisLock.constants";
 
 function createRedisLockProvider(options: RedisLockOptions): any[] {
-  return [ { provide: REDIS_LOCK_OPTIONS, useValue: options || {} }];
+  return [{ provide: REDIS_LOCK_OPTIONS, useValue: options || {} }];
 }
 
 @Module({
   imports: [],
   providers: [RedisLockService],
-  exports: [RedisLockService],
+  exports: [RedisLockService]
 })
 export class RedisLockModule {
-  static register(options: RedisLockOptions): DynamicModule {
+  static register(options: RedisLockOptions, global: boolean = false): DynamicModule {
     return {
+      global,
       module: RedisLockModule,
-      providers: createRedisLockProvider(options),
+      providers: createRedisLockProvider(options)
     };
   }
 
-  static registerAsync(options: RedisLockAsyncOptions): DynamicModule {
+  static registerAsync(options: RedisLockAsyncOptions, global: boolean = false): DynamicModule {
     return {
+      global,
       module: RedisLockModule,
       imports: options.imports || [],
-      providers: this.createAsyncProviders(options),
+      providers: this.createAsyncProviders(options)
     };
   }
 
@@ -36,9 +38,9 @@ export class RedisLockModule {
       this.createAsyncOptionsProvider(options),
       {
         provide: options.useClass,
-        useClass: options.useClass,
+        useClass: options.useClass
       }
-    ]
+    ];
   }
 
   private static createAsyncOptionsProvider(options: RedisLockAsyncOptions): Provider {
@@ -46,13 +48,13 @@ export class RedisLockModule {
       return {
         provide: REDIS_LOCK_OPTIONS,
         useFactory: options.useFactory,
-        inject: options.inject || [],
+        inject: options.inject || []
       };
     }
     return {
       provide: REDIS_LOCK_OPTIONS,
       useFactory: async (optionsFactory: RedisLockOptionsFactory) => await optionsFactory.createRedisLockOptions(),
-      inject: [options.useExisting || options.useClass],
+      inject: [options.useExisting || options.useClass]
     };
   }
 }
