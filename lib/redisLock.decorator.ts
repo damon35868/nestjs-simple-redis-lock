@@ -30,7 +30,7 @@ export function RedisLock(lockName: String | GetLockNameFunc, options?: ILockOpt
     descriptor.value = async function (...args) {
       options = {
         ...options,
-        single: options.single === undefined ? true : options.single
+        single: (options || {}).single === undefined ? true : options.single
       };
 
       const { single = true } = options || {};
