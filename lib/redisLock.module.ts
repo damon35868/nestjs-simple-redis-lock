@@ -4,7 +4,8 @@ import { RedisLockOptions, RedisLockAsyncOptions, RedisLockOptionsFactory } from
 import { REDIS_LOCK_OPTIONS } from "./redisLock.constants";
 
 function createRedisLockProvider(options: RedisLockOptions): any[] {
-  return [{ provide: REDIS_LOCK_OPTIONS, useValue: options || {} }];
+  const { isGlobal, ...value } = options || {};
+  return [{ provide: REDIS_LOCK_OPTIONS, useValue: value || {} }];
 }
 
 @Module({
@@ -13,17 +14,17 @@ function createRedisLockProvider(options: RedisLockOptions): any[] {
   exports: [RedisLockService]
 })
 export class RedisLockModule {
-  static register(options: RedisLockOptions, global: boolean = false): DynamicModule {
+  static register(options: RedisLockOptions): DynamicModule {
     return {
-      global,
+      global: !!options.isGlobal,
       module: RedisLockModule,
       providers: createRedisLockProvider(options)
     };
   }
 
-  static registerAsync(options: RedisLockAsyncOptions, global: boolean = false): DynamicModule {
+  static registerAsync(options: RedisLockAsyncOptions): DynamicModule {
     return {
-      global,
+      global: !!options.isGlobal,
       module: RedisLockModule,
       imports: options.imports || [],
       providers: this.createAsyncProviders(options)
@@ -34,13 +35,7 @@ export class RedisLockModule {
     if (options.useExisting || options.useFactory) {
       return [this.createAsyncOptionsProvider(options)];
     }
-    return [
-      this.createAsyncOptionsProvider(options),
-      {
-        provide: options.useClass,
-        useClass: options.useClass
-      }
-    ];
+    return [this.createAsyncOptionsProvider(options), { provide: options.useClass, useClass: options.useClass }];
   }
 
   private static createAsyncOptionsProvider(options: RedisLockAsyncOptions): Provider {

@@ -31,6 +31,7 @@ import { RedisLockModule } from '@damon35868/nestjs-simple-redis-lock';
       inject: [ConfigService],
     }),
    RedisLockModule.registerAsync({
+     // isGlobal: true,
       useFactory: async (redisManager: RedisManager) => {
         return { prefix: ':lock:', client: redisManager.getClient() }
       },

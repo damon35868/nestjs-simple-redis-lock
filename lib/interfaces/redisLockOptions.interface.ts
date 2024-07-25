@@ -3,6 +3,7 @@ import Redis from "ioredis";
 import { RedisLockService } from "lib/redisLock.service";
 
 export interface RedisLockOptions {
+  isGlobal?: boolean;
   prefix?: string;
   client?: Redis;
 }
@@ -12,6 +13,7 @@ export interface RedisLockOptionsFactory {
 }
 
 export interface RedisLockAsyncOptions extends Pick<ModuleMetadata, "imports"> {
+  isGlobal?: boolean;
   useExisting?: Type<RedisLockOptionsFactory>;
   useClass?: Type<RedisLockOptionsFactory>;
   useFactory?: (...args: any[]) => Promise<RedisLockOptions> | RedisLockOptions;
