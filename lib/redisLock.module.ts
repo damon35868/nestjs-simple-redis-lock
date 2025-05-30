@@ -1,7 +1,7 @@
-import { Module, DynamicModule, Provider } from "@nestjs/common";
-import { RedisLockService } from "./redisLock.service";
-import { RedisLockOptions, RedisLockAsyncOptions, RedisLockOptionsFactory } from "./interfaces/redisLockOptions.interface";
+import { DynamicModule, Logger, Module, OnModuleInit, Provider } from "@nestjs/common";
+import { RedisLockAsyncOptions, RedisLockOptions, RedisLockOptionsFactory } from "./interfaces/redisLockOptions.interface";
 import { REDIS_LOCK_OPTIONS } from "./redisLock.constants";
+import { RedisLockService } from "./redisLock.service";
 
 function createRedisLockProvider(options: RedisLockOptions): any[] {
   const { isGlobal, ...value } = options || {};
@@ -13,7 +13,12 @@ function createRedisLockProvider(options: RedisLockOptions): any[] {
   providers: [RedisLockService],
   exports: [RedisLockService]
 })
-export class RedisLockModule {
+export class RedisLockModule implements OnModuleInit {
+  onModuleInit() {
+    const logger = new Logger("RedisLockModule", { timestamp: true });
+    logger.log("RedisLockModule dependencies initialized");
+  }
+
   static register(options: RedisLockOptions): DynamicModule {
     return {
       global: !!options.isGlobal,
